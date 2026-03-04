@@ -1,20 +1,30 @@
 package com.smartbudget.ui;
 
-import com.smartbudget.service.InvestmentAdvisor;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class InvestmentSuggestionsView {
 
     public static void show(Stage stage) {
-        VBox layout = new VBox(10);
-        layout.setPadding(new Insets(20));
 
-        Label titleLabel = new Label("Investment Suggestions");
+        // ===== HEADER =====
+        Label headerTitle = new Label("Investment Suggestions");
+        headerTitle.setFont(Font.font("Arial", FontWeight.BOLD, 22));
+        headerTitle.setTextFill(Color.WHITE);
 
+        HBox header = new HBox(headerTitle);
+        header.setAlignment(Pos.CENTER);
+        header.setPadding(new Insets(20));
+        header.setStyle("-fx-background-color: #2E86C1;");
+
+        // ===== INPUT FIELDS =====
         TextField incomeField = new TextField();
         incomeField.setPromptText("Disposable Income");
 
@@ -25,10 +35,25 @@ public class InvestmentSuggestionsView {
         TextField durationField = new TextField();
         durationField.setPromptText("Goal Duration (months)");
 
-        Button suggestBtn = new Button("Get Suggestions");
+        VBox inputBox = new VBox(15, incomeField, riskBox, durationField);
+        inputBox.setAlignment(Pos.CENTER);
+        inputBox.setPadding(new Insets(10));
+
+        // ===== RESULT AREA =====
         TextArea resultArea = new TextArea();
         resultArea.setEditable(false);
         resultArea.setWrapText(true);
+        resultArea.setPrefHeight(180);
+
+        // ===== BUTTONS =====
+        Button suggestBtn = new Button("Get Suggestions");
+        suggestBtn.setPrefWidth(200);
+        suggestBtn.setStyle("""
+                -fx-background-color: #28B463;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 8;
+                """);
 
         suggestBtn.setOnAction(e -> {
             double income;
@@ -47,7 +72,6 @@ public class InvestmentSuggestionsView {
                 return;
             }
 
-            // Capture console output of InvestmentAdvisor
             StringBuilder sb = new StringBuilder();
             sb.append("Income: ").append(income)
                     .append(" | Risk: ").append(risk)
@@ -72,12 +96,41 @@ public class InvestmentSuggestionsView {
             resultArea.setText(sb.toString());
         });
 
-        Button backBtn = new Button("Back");
+        Button backBtn = new Button("Back to Dashboard");
+        backBtn.setPrefWidth(200);
+        backBtn.setStyle("""
+                -fx-background-color: #2E86C1;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 8;
+                """);
         backBtn.setOnAction(e -> DashboardView.show(stage));
 
-        layout.getChildren().addAll(titleLabel, incomeField, riskBox, durationField, suggestBtn, resultArea, backBtn);
+        VBox buttonsBox = new VBox(15, suggestBtn, backBtn);
+        buttonsBox.setAlignment(Pos.CENTER);
 
-        stage.setScene(new Scene(layout, 450, 400));
+        // ===== MAIN CONTENT CARD =====
+        VBox content = new VBox(20, inputBox, resultArea, buttonsBox);
+        content.setAlignment(Pos.TOP_CENTER);
+        content.setPadding(new Insets(30));
+
+        VBox card = new VBox(content);
+        card.setStyle("""
+                -fx-background-color: white;
+                -fx-background-radius: 15;
+                -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 5);
+                """);
+
+        StackPane centerPane = new StackPane(card);
+        centerPane.setPadding(new Insets(30));
+        centerPane.setStyle("-fx-background-color: #F4F6F7;");
+
+        BorderPane root = new BorderPane();
+        root.setTop(header);
+        root.setCenter(centerPane);
+
+        Scene scene = new Scene(root, 600, 500);
+        stage.setScene(scene);
         stage.setTitle("Investment Suggestions");
         stage.show();
     }

@@ -5,22 +5,35 @@ import com.smartbudget.model.User;
 import com.smartbudget.service.ExpenseManager;
 import com.smartbudget.service.Group;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class StartupView {
 
     public static void show(Stage stage) {
 
-        TextField budgetField = new TextField();
-        ComboBox<String> groupTypeBox = new ComboBox<>();
-        Spinner<Integer> memberSpinner = new Spinner<>(1, 10, 1);
+        // ===== Title =====
+        Label title = new Label("Smart Expense Control");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        title.setTextFill(Color.DARKBLUE);
 
+        // ===== Budget Field =====
+        TextField budgetField = new TextField();
+        budgetField.setPromptText("Enter Monthly Budget");
+
+        // ===== Group Type =====
+        ComboBox<String> groupTypeBox = new ComboBox<>();
         groupTypeBox.getItems().addAll("Single", "Couple", "Family", "Roommates");
         groupTypeBox.setValue("Single");
 
+        // ===== Member Spinner =====
+        Spinner<Integer> memberSpinner = new Spinner<>(1, 10, 2);
         memberSpinner.setDisable(true);
 
         groupTypeBox.setOnAction(e -> {
@@ -28,8 +41,33 @@ public class StartupView {
             memberSpinner.setDisable(isSingle);
         });
 
+        // ===== Start Button =====
         Button startBtn = new Button("Start System");
+        startBtn.setPrefWidth(200);
+        startBtn.setStyle("""
+                -fx-background-color: #2E86C1;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 8;
+                """);
 
+        startBtn.setOnMouseEntered(e ->
+                startBtn.setStyle("""
+                -fx-background-color: #1B4F72;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 8;
+                """));
+
+        startBtn.setOnMouseExited(e ->
+                startBtn.setStyle("""
+                -fx-background-color: #2E86C1;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 8;
+                """));
+
+        // ===== Button Logic =====
         startBtn.setOnAction(e -> {
             try {
                 double budget = Double.parseDouble(budgetField.getText());
@@ -53,7 +91,8 @@ public class StartupView {
             }
         });
 
-        VBox layout = new VBox(10,
+        // ===== Form Layout =====
+        VBox form = new VBox(12,
                 new Label("Monthly Budget"),
                 budgetField,
                 new Label("Living Type"),
@@ -63,9 +102,27 @@ public class StartupView {
                 startBtn
         );
 
-        layout.setPadding(new Insets(20));
-        stage.setScene(new Scene(layout, 320, 360));
+        form.setAlignment(Pos.CENTER_LEFT);
+
+        // ===== Card Style Container =====
+        VBox card = new VBox(20, title, form);
+        card.setPadding(new Insets(25));
+        card.setAlignment(Pos.CENTER);
+        card.setStyle("""
+                -fx-background-color: white;
+                -fx-background-radius: 15;
+                -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 5);
+                """);
+
+        // ===== Root Layout =====
+        StackPane root = new StackPane(card);
+        root.setPadding(new Insets(40));
+        root.setStyle("-fx-background-color: #F2F4F4;");
+
+        Scene scene = new Scene(root, 400, 450);
+
         stage.setTitle("Smart Expense Control");
+        stage.setScene(scene);
         stage.show();
     }
 }
